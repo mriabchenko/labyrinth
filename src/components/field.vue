@@ -114,6 +114,8 @@
       recreateField(){
       	this.walls.position = [];
       	this.player.position = '';
+				this.calcFieldItemStyle();
+				this.calcFieldStyle();
 				this.addWallBlocks();
 				this.addPlayer();
       },
@@ -155,18 +157,21 @@
         if (value > this.field.limits.max.width) this.field.width = this.field.limits.max.width
         else if (value < this.field.limits.min.width || Number.isNaN(value)) this.field.width = this.field.limits.min.width
         else this.field.width = value
+        this.recreateField();
       },
       handleHeightInput(event){
         let value = Number(event.target.value);
         if (value > this.field.limits.max.height) this.field.height = this.field.limits.max.height
         else if (value < this.field.limits.min.height || Number.isNaN(value)) this.field.height = this.field.limits.min.height
         else this.field.height = value
+        this.recreateField();
       },
       handleWallsNumberInput(event){
         let value = Number(event.target.value);
         if (value > this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1
         else if (value < 0 || Number.isNaN(value)) this.walls.number = 0
         else this.walls.number = value
+        this.recreateField();
       }
 		},
     computed: {
