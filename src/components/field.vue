@@ -1,13 +1,31 @@
 <template>
   <div>
-    <button @click="recreateField">Recreate field</button>
-    <section class="field">
+    <div class="control">
+      <h3>Field parameters</h3>
+      <p>
+        <label>Field width</label>
+        <input type="number" v-model="field.width">
+      </p>
+      <p>
+        <label>Field width</label>
+        <input type="number" v-model="field.height">
+      </p>
+      <p>
+        <label>Walls number</label>
+        <input type="number" v-model="walls.number">
+      </p>
+      <p>
+        <button @click="recreateField">Recreate field</button>
+      </p>
+    </div>
+
+    <section class="field" ref="field" :style="fieldStyle">
       <div
-        v-for="i in field.width*field.height"
+        v-for="i in field.width * field.height"
         :key="i"
         class="field__item"
         :class="defineItemClass(i)"
-        :style="{'order':i}">{{i}}</div>
+        :style="fieldItemStyle">{{i}}</div>
     </section>
   </div>
 </template>
@@ -17,6 +35,8 @@
   	data(){
   		return {
         field: {
+          widthPx: '',
+          heightPx: '',
           width: 10,
           height: 10
         },
@@ -27,6 +47,8 @@
         player: {
           position: ''
         },
+        fieldStyle: {},
+        fieldItemStyle: {}
       }
     },
 		methods: {
@@ -36,7 +58,7 @@
       addWallBlocks(){
 				let i = 0, wallPosition;
 				while (i < this.walls.number){
-					wallPosition = Math.floor(Math.random() * 100 + 1);
+					wallPosition = Math.floor(Math.random() * this.fieldItemsNumber + 1);
 					if (this.walls.position.indexOf(wallPosition) == -1) {
 						this.walls.position.push(wallPosition);
 						i++;
@@ -77,13 +99,39 @@
       	function checkIfTheMoveIsPossible(currentPosition, direction) {
 
 				}
+      },
+      calcFieldActualSize(){
+        this.field.heightPx = this.$refs.field.clientHeight;
+        this.field.widthPx = this.$refs.field.clientWidth;
+      },
+      calcFieldItemStyle(){
+        let styleObj = {
+          'flex-basis' : Math.floor(Math.sqrt((this.field.widthPx * this.field.heightPx) / (this.fieldItemsNumber * 2))) + 'px'
+        };
+        this.fieldItemStyle = styleObj;
+      },
+      calcFieldStyle(){
+        let fieldItemSideLenght =  parseInt(this.fieldItemStyle['flex-basis']);
+        let styleObj = {
+          'width' : fieldItemSideLenght * this.field.width + 'px',
+          'height' : fieldItemSideLenght * this.field.height + 'px'
+        };
+        this.fieldStyle = styleObj;
       }
 		},
+    computed: {
+  	  fieldItemsNumber(){
+  	    return this.field.height * this.field.width;
+      }
+    },
 		mounted(){
   		let vm = this;
 			this.$nextTick(function() {
 				window.addEventListener('resize', this.checkDevice);
 				window.addEventListener('keydown', function(event){vm.movePlayer(event)}, true);
+				this.calcFieldActualSize();
+				this.calcFieldItemStyle();
+				this.calcFieldStyle();
 				this.checkDevice();
 				this.addWallBlocks();
 				this.addPlayer();
