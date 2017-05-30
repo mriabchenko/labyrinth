@@ -104,14 +104,14 @@
         if (this.walls.position.indexOf(item) != -1) return 'field__item_wall';
         if (this.player.position == item) return 'field__item_player';
 			},
-      createField(){
+      createField(){//functions sequence to create new field
         this.calcFieldActualSize();
         this.calcFieldItemStyle();
         this.calcFieldStyle();
         this.addWallBlocks();
         this.addPlayer();
       },
-      recreateField(){
+      recreateField(){//functions sequence to recreate new field
       	this.walls.position = [];
       	this.player.position = '';
 				this.calcFieldItemStyle();
@@ -119,17 +119,16 @@
 				this.addWallBlocks();
 				this.addPlayer();
       },
-      movePlayer(event){
+      movePlayer(event){//moving player around the field
       	let pressedKey = event.key;
       	let direction;
-      	switch (pressedKey){
+      	switch (pressedKey){//determination of the desired moving direction
           case 'w': direction = 'up'; break;
           case 'd': direction = 'right'; break;
           case 's': direction = 'down'; break;
           case 'a': direction = 'left'; break;
           default: direction = 'notSet'
         }
-        console.log(direction);
       	function checkIfTheMoveIsPossible(currentPosition, direction) {
 
 				}
@@ -174,15 +173,16 @@
         let value = Number(event.target.value);
         if (value > this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1
         else if (value < 0 || Number.isNaN(value)) this.walls.number = 0
-        else this.walls.number = value
+        else this.walls.number = value;
+				//check if all that walls can fit into new size field
         this.recreateField();
       },
-      handleWallsNumber() {
+      handleWallsNumber() { //check if all that walls can fit into the field
       	if (this.walls.number > this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1;
       }
 		},
     computed: {
-  	  fieldItemsNumber(){
+  	  fieldItemsNumber(){ //how many field items are in the field
   	    return this.field.height * this.field.width;
       }
     },
@@ -200,7 +200,7 @@
         this.createField();
 			})
 		},
-		beforeDestroy() {
+		beforeDestroy() {//removing event listeners
 			window.removeEventListener('resize', this.checkDevice);
 			window.removeEventListener('keydown', function(event){vm.movePlayer(event)});
 		}
