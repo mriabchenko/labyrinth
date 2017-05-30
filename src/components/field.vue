@@ -4,18 +4,33 @@
       <h3>Field parameters</h3>
       <p>
         <label>Field width</label>
-        <input type="number" v-model="field.width">
+        <input
+          type="number"
+          :value="field.width"
+          @input="handleWidthInput"
+          :max="field.limits.max.width"
+          :min="field.limits.min.width">
       </p>
       <p>
-        <label>Field width</label>
-        <input type="number" v-model="field.height">
+        <label>Field height</label>
+        <input
+          type="number"
+          :value="field.height"
+          @input="handleHeightInput"
+          :max="field.limits.max.height"
+          :min="field.limits.min.height">
       </p>
       <p>
         <label>Walls number</label>
-        <input type="number" min="1" :max="fieldItemsNumber - 1" v-model="walls.number">
+        <input
+          type="number"
+          :value="walls.number"
+          @input="handleWallsNumberInput"
+          :max="fieldItemsNumber - 1"
+          :min="0">
       </p>
       <p>
-        <button @click="recreateField">Recreate field</button>
+        <button class="btn" @click="recreateField">Recreate field</button>
       </p>
     </div>
 
@@ -38,7 +53,17 @@
           widthPx: '',
           heightPx: '',
           width: 20,
-          height: 20
+          height: 20,
+          limits: { //hardcoded limits
+            max: {
+              width: 20,
+              height: 20
+            },
+            min: {
+              width: 2,
+              height: 2
+            }
+          },
         },
         walls: {
           number: 30,
@@ -124,6 +149,24 @@
           'height' : fieldItemSideLenght * this.field.height + 'px'
         };
         this.fieldStyle = styleObj;
+      },
+      handleWidthInput(event){
+        let value = Number(event.target.value);
+        if (value > this.field.limits.max.width) this.field.width = this.field.limits.max.width
+        else if (value < this.field.limits.min.width || Number.isNaN(value)) this.field.width = this.field.limits.min.width
+        else this.field.width = value
+      },
+      handleHeightInput(event){
+        let value = Number(event.target.value);
+        if (value > this.field.limits.max.height) this.field.height = this.field.limits.max.height
+        else if (value < this.field.limits.min.height || Number.isNaN(value)) this.field.height = this.field.limits.min.height
+        else this.field.height = value
+      },
+      handleWallsNumberInput(event){
+        let value = Number(event.target.value);
+        if (value > this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1
+        else if (value < 0 || Number.isNaN(value)) this.walls.number = 0
+        else this.walls.number = value
       }
 		},
     computed: {

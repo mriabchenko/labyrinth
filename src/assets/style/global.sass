@@ -7,3 +7,16 @@ $danger: #d9534f
 $inverse: #292b2c
 body
   background-color: $info
+.btn
+  border: 1px solid $inverse
+  background-color: $info
+  padding: 10px
+  transition-property: background-color
+  transition-duration: 0.25s
+  &:hover
+    background-color: $primary
+    cursor: pointer
+  &:active
+    background-color: $success
+  &:focus
+    outline: none
