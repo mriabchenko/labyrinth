@@ -52,21 +52,21 @@
         field: {
           widthPx: '',
           heightPx: '',
-          width: 20,
-          height: 20,
+          width: 20, //blocks number
+          height: 20, //blocks number
           limits: { //hardcoded limits
             max: {
-              width: 20,
-              height: 20
+              width: 20, //block number
+              height: 20 //block number
             },
             min: {
-              width: 2,
-              height: 2
+              width: 2, //blocks number
+              height: 2 //blocks number
             }
           },
         },
         walls: {
-          number: 30,
+          number: 30, //blocks number
           position: []
         },
         player: {
@@ -77,7 +77,7 @@
       }
     },
 		methods: {
-			checkDevice() {
+			checkDevice() { //update info about device (width, height, scroll position ... )
 				this.$store.commit('checkDevice');
 			},
       addWallBlocks(){
@@ -100,7 +100,7 @@
 					}
 				}
       },
-			defineItemClass(item) {
+			defineItemClass(item) { //is the block is wall or player or just empty field
         if (this.walls.position.indexOf(item) != -1) return 'field__item_wall';
         if (this.player.position == item) return 'field__item_player';
 			},
@@ -152,26 +152,33 @@
         };
         this.fieldStyle = styleObj;
       },
-      handleWidthInput(event){
+      handleWidthInput(event){ //ensure that inputted value is not collapsing anything
         let value = Number(event.target.value);
         if (value > this.field.limits.max.width) this.field.width = this.field.limits.max.width
         else if (value < this.field.limits.min.width || Number.isNaN(value)) this.field.width = this.field.limits.min.width
-        else this.field.width = value
+        else this.field.width = value;
+        //check if all that walls can fit into new size field
+        this.handleWallsNumber();
         this.recreateField();
       },
-      handleHeightInput(event){
+      handleHeightInput(event){ //ensure that inputted value is not collapsing anything
         let value = Number(event.target.value);
         if (value > this.field.limits.max.height) this.field.height = this.field.limits.max.height
         else if (value < this.field.limits.min.height || Number.isNaN(value)) this.field.height = this.field.limits.min.height
-        else this.field.height = value
+        else this.field.height = value;
+        //check if all that walls can fit into new size field
+        this.handleWallsNumber();
         this.recreateField();
       },
-      handleWallsNumberInput(event){
+      handleWallsNumberInput(event){ //ensure that inputted value is not collapsing anything
         let value = Number(event.target.value);
         if (value > this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1
         else if (value < 0 || Number.isNaN(value)) this.walls.number = 0
         else this.walls.number = value
         this.recreateField();
+      },
+      handleWallsNumber() {
+      	if (this.walls.number > this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1;
       }
 		},
     computed: {
@@ -179,9 +186,8 @@
   	    return this.field.height * this.field.width;
       }
     },
-    watch: {
+    watch: { //recreate field when someone define a new walls number
   	  'walls.number'(){
-  	    console.log('walls');
   	    this.recreateField();
       }
     },
@@ -190,12 +196,13 @@
 			this.$nextTick(function() {
         this.checkDevice();
         window.addEventListener('resize', this.checkDevice);
-        window.addEventListener('keydown', function(event){vm.movePlayer(event)}, true);
+        window.addEventListener('keydown', function(event){vm.movePlayer(event)});
         this.createField();
 			})
 		},
 		beforeDestroy() {
 			window.removeEventListener('resize', this.checkDevice);
+			window.removeEventListener('keydown', function(event){vm.movePlayer(event)});
 		}
   }
 </script>
