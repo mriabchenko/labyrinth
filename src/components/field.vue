@@ -12,7 +12,7 @@
       </p>
       <p>
         <label>Walls number</label>
-        <input type="number" v-model="walls.number">
+        <input type="number" min="1" :max="fieldItemsNumber - 1" v-model="walls.number">
       </p>
       <p>
         <button @click="recreateField">Recreate field</button>
@@ -37,11 +37,11 @@
         field: {
           widthPx: '',
           heightPx: '',
-          width: 10,
-          height: 10
+          width: 20,
+          height: 20
         },
         walls: {
-          number: 40,
+          number: 30,
           position: []
         },
         player: {
@@ -79,6 +79,13 @@
         if (this.walls.position.indexOf(item) != -1) return 'field__item_wall';
         if (this.player.position == item) return 'field__item_player';
 			},
+      createField(){
+        this.calcFieldActualSize();
+        this.calcFieldItemStyle();
+        this.calcFieldStyle();
+        this.addWallBlocks();
+        this.addPlayer();
+      },
       recreateField(){
       	this.walls.position = [];
       	this.player.position = '';
@@ -106,7 +113,7 @@
       },
       calcFieldItemStyle(){
         let styleObj = {
-          'flex-basis' : Math.floor(Math.sqrt((this.field.widthPx * this.field.heightPx) / (this.fieldItemsNumber * 2))) + 'px'
+          'flex-basis' : Math.floor(Math.sqrt((this.field.widthPx * this.field.heightPx) / (this.fieldItemsNumber))) + 'px'
         };
         this.fieldItemStyle = styleObj;
       },
@@ -124,17 +131,19 @@
   	    return this.field.height * this.field.width;
       }
     },
+    watch: {
+  	  'walls.number'(){
+  	    console.log('walls');
+  	    this.recreateField();
+      }
+    },
 		mounted(){
   		let vm = this;
 			this.$nextTick(function() {
-				window.addEventListener('resize', this.checkDevice);
-				window.addEventListener('keydown', function(event){vm.movePlayer(event)}, true);
-				this.calcFieldActualSize();
-				this.calcFieldItemStyle();
-				this.calcFieldStyle();
-				this.checkDevice();
-				this.addWallBlocks();
-				this.addPlayer();
+        this.checkDevice();
+        window.addEventListener('resize', this.checkDevice);
+        window.addEventListener('keydown', function(event){vm.movePlayer(event)}, true);
+        this.createField();
 			})
 		},
 		beforeDestroy() {
