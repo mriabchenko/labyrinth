@@ -33,8 +33,10 @@
         <button class="btn" @click="recreateField">Recreate field</button>
       </p>
     </div>
-
-    <section class="field" ref="field" :style="fieldStyle">
+    <section
+      class="field"
+      ref="field"
+      :style="fieldStyle">
       <div
         v-for="i in field.width * field.height"
         :key="i"
