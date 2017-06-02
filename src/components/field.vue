@@ -48,6 +48,7 @@
 </template>
 
 <script>
+  import f from './../functions'
   export default {
   	data(){
   		return {
@@ -85,7 +86,7 @@
       addWallBlocks(){
 				let i = 0, wallPosition;
 				while (i < this.walls.number){
-					wallPosition = Math.floor(Math.random() * this.fieldItemsNumber + 1);
+					wallPosition = f.random(this.fieldItemsNumber);
 					if (this.walls.position.indexOf(wallPosition) == -1) {
 						this.walls.position.push(wallPosition);
 						i++;
@@ -95,7 +96,7 @@
       addPlayer(){
       	let playerPosition;
 				while (true) {
-					playerPosition = Math.floor(Math.random() * 100 + 1);
+					playerPosition = f.random(100);
 					if (this.walls.position.indexOf(playerPosition) == -1) {
 						this.player.position = playerPosition;
 						break;
@@ -122,18 +123,9 @@
 				this.addPlayer();
       },
       movePlayer(event){//moving player around the field
-      	let pressedKey = event.key;
-      	let direction;
-      	switch (pressedKey){//determination of the desired moving direction
-          case 'w': direction = 'up'; break;
-          case 'd': direction = 'right'; break;
-          case 's': direction = 'down'; break;
-          case 'a': direction = 'left'; break;
-          default: direction = 'notSet'
-        }
-      	function checkIfTheMoveIsPossible(currentPosition, direction) {
-
-				}
+      	let direction = f.defineDirection(event.key);
+        console.log(direction);
+      	console.log(f.checkIfTheMoveIsPossible(this.fieldState, direction))
       },
       calcFieldActualSize(){
         this.field.heightPx = this.$refs.field.clientHeight;
@@ -186,6 +178,16 @@
     computed: {
   	  fieldItemsNumber(){ //how many field items are in the field
   	    return this.field.height * this.field.width;
+      },
+      fieldState(){
+  	  	let field = new Array(this.field.height);
+  	  	for (var i = 0; i < field.length; i++) {
+					field[i] = new Array(this.field.width)
+          for (var j = 0; j < this.field.width; j++){
+						field[i][j] = i+' '+j;
+          }
+				}
+        return field;
       }
     },
     watch: { //recreate field when someone define a new walls number
@@ -197,9 +199,10 @@
   		let vm = this;
 			this.$nextTick(function() {
         this.checkDevice();
-        window.addEventListener('resize', this.checkDevice);
-        window.addEventListener('keydown', function(event){vm.movePlayer(event)});
-        this.createField();
+				window.addEventListener('resize', this.checkDevice);
+				window.addEventListener('keydown', function(event){vm.movePlayer(event)});
+				this.createField();
+				console.log(this.fieldState);
 			})
 		},
 		beforeDestroy() {//removing event listeners
