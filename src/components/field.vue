@@ -55,21 +55,21 @@
         field: {
           widthPx: '',
           heightPx: '',
-          width: 20, //blocks number
-          height: 20, //blocks number
+          width: 3, //blocks number
+          height: 3, //blocks number
           limits: { //hardcoded limits
             max: {
               width: 20, //block number
               height: 20 //block number
             },
             min: {
-              width: 2, //blocks number
-              height: 2 //blocks number
+              width: 3, //blocks number
+              height: 3 //blocks number
             }
           },
         },
         walls: {
-          number: 30, //blocks number
+          number: 5, //blocks number
           position: []
         },
         player: {
@@ -86,7 +86,7 @@
       addWallBlocks(){
 				let i = 0, wallPosition;
 				while (i < this.walls.number){
-					wallPosition = f.random(this.fieldItemsNumber);
+					wallPosition = f.random(this.fieldItemsNumber - 1);
 					if (this.walls.position.indexOf(wallPosition) == -1) {
 						this.walls.position.push(wallPosition);
 						i++;
@@ -96,7 +96,7 @@
       addPlayer(){
       	let playerPosition;
 				while (true) {
-					playerPosition = f.random(100);
+					playerPosition = f.random(this.fieldItemsNumber);
 					if (this.walls.position.indexOf(playerPosition) == -1) {
 						this.player.position = playerPosition;
 						break;
@@ -120,11 +120,36 @@
 				this.calcFieldItemStyle();
 				this.calcFieldStyle();
 				this.addWallBlocks();
+				this.handleWallsNumber();
 				this.addPlayer();
       },
       movePlayer(event){//moving player around the field
       	let direction = f.defineDirection(event.key);
-      	console.log(f.checkIfTheMoveIsPossible(this.fieldState, direction))
+      	if (f.checkIfTheMoveIsPossible(this.fieldState, direction)) {
+      		let up, right, down, left;
+      		switch (direction){
+//            case 'up': {
+//							up = this.fieldState.items[this.player.position - this.field.width];
+//							console.log(up);
+//              break;
+//            };
+//						case 'right': {
+//							right = this.fieldState.items[this.player.position + 1];
+//							console.log(right);
+//							break;
+//						};
+//						case 'down': {
+//							down = this.fieldState.items[this.player.position + this.field.width];
+//							console.log(down);
+//							break;
+//						};
+//						case 'left': {
+//							left = this.fieldState.items[this.player.position - 1];
+//							console.log(left);
+//							break;
+//						};
+          }
+        }
       },
       calcFieldActualSize(){
         this.field.heightPx = this.$refs.field.clientHeight;
@@ -164,14 +189,14 @@
       },
       handleWallsNumberInput(event){ //ensure that inputted value is not collapsing anything
         let value = Number(event.target.value);
-        if (value > this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1
+        if (value >= this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1
         else if (value < 0 || Number.isNaN(value)) this.walls.number = 0
         else this.walls.number = value;
 				//check if all that walls can fit into new size field
         this.recreateField();
       },
       handleWallsNumber() { //check if all that walls can fit into the field
-      	if (this.walls.number > this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1;
+      	if (this.walls.number >= this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1;
       }
 		},
     computed: {
@@ -185,11 +210,12 @@
           else if (this.walls.position.indexOf(i) != -1) fieldItems[i] = 'w'
           else fieldItems[i] = 0;
 				}
-        return {
+        let fieldObj = {
   	  		height: this.field.height,
           width: this.field.width,
           items: fieldItems
 				};
+  	  	return fieldObj;
       }
     },
     watch: { //recreate field when someone define a new walls number
