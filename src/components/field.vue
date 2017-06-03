@@ -179,16 +179,17 @@
   	    return this.field.height * this.field.width;
       },
       fieldState(){//two-dimensional array which represents a current field state. w - wall item, p - player item
-  	  	let field = new Array(this.field.height);
-  	  	for (var i = 0; i < field.length; i++) {
-					field[i] = new Array(this.field.width)
-          for (var j = 0; j < this.field.width; j++){
-						if (i + j == this.player.position) field[i][j] = 'p'
-            else if (this.walls.position.indexOf(i + j) != -1) field [i][j] = 'w'
-            else field[i][j] = 0;
-          }
+  	  	let fieldItems = new Array(this.fieldItemsNumber);
+  	  	for (var i = 0; i < this.fieldItemsNumber; i++) {
+          if (i == this.player.position) fieldItems[i] = 'p'
+          else if (this.walls.position.indexOf(i) != -1) fieldItems[i] = 'w'
+          else fieldItems[i] = 0;
 				}
-        return field;
+        return {
+  	  		height: this.field.height,
+          width: this.field.width,
+          items: fieldItems
+				};
       }
     },
     watch: { //recreate field when someone define a new walls number
