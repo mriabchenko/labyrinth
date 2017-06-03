@@ -41,8 +41,8 @@
         v-for="i in field.width * field.height"
         :key="i"
         class="field__item"
-        :class="defineItemClass(i)"
-        :style="fieldItemStyle">{{i}}</div>
+        :class="defineItemClass(i-1)"
+        :style="fieldItemStyle">{{i-1}}</div>
     </section>
   </div>
 </template>
@@ -124,7 +124,6 @@
       },
       movePlayer(event){//moving player around the field
       	let direction = f.defineDirection(event.key);
-        console.log(direction);
       	console.log(f.checkIfTheMoveIsPossible(this.fieldState, direction))
       },
       calcFieldActualSize(){
@@ -179,12 +178,14 @@
   	  fieldItemsNumber(){ //how many field items are in the field
   	    return this.field.height * this.field.width;
       },
-      fieldState(){
+      fieldState(){//two-dimensional array which represents a current field state. w - wall item, p - player item
   	  	let field = new Array(this.field.height);
   	  	for (var i = 0; i < field.length; i++) {
 					field[i] = new Array(this.field.width)
           for (var j = 0; j < this.field.width; j++){
-						field[i][j] = i+' '+j;
+						if (i + j == this.player.position) field[i][j] = 'p'
+            else if (this.walls.position.indexOf(i + j) != -1) field [i][j] = 'w'
+            else field[i][j] = 0;
           }
 				}
         return field;
@@ -202,7 +203,6 @@
 				window.addEventListener('resize', this.checkDevice);
 				window.addEventListener('keydown', function(event){vm.movePlayer(event)});
 				this.createField();
-				console.log(this.fieldState);
 			})
 		},
 		beforeDestroy() {//removing event listeners

@@ -12,6 +12,7 @@ export default {
 		}
   },
 	checkIfTheMoveIsPossible(field, direction) {
-
+		console.log('field', field, '\n direction', direction);
+		return true;
   }
 }
