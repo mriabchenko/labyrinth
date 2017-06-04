@@ -31,5 +31,8 @@ export default {
 		//if player has neighbor item in this direstion and it is not a wall
 		if ((Object.keys(neighbours).indexOf(direction) != -1)&&(neighbours[direction] != 'w')) return true
 		else return false;
-  }
+  },
+  autoPilotChooseDirection(movementMap, wallsMap){
+		return 'up'
+	}
 }

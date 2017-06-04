@@ -1,0 +1,41 @@
+//default fade transition
+.fade-enter
+  opacity: 0
+.fade-enter-to
+  transition: opacity 1s ease
+  opacity: 1
+.fade-leave
+  opacity: 1
+.fade-leave-to
+  transition: opacity 1s ease
+  opacity: 0
+
+//slide-right, slide-left routing transitions
+//left
+.slide-left-enter
+  margin-left: 100%
+.slide-left-enter-to
+  transition: all 1s linear
+  margin-left: 0%
+  position: fixed
+  top: 0
+  width: 100%
+.slide-left-leave
+  transform: translateX(0px)
+.slide-left-leave-to
+  transition: all 1s linear
+  transform: translateX(-100%)
+//right
+.slide-right-enter
+  margin-left: -100%
+.slide-right-enter-to
+  transition: all 1s linear
+  margin-left: 0%
+  position: fixed
+  top: 0
+  width: 100%
+.slide-right-leave
+  transform: translateX(0px)
+.slide-right-leave-to
+  transition: all 1s linear
+  transform: translateX(100%)

@@ -1,6 +1,9 @@
 <template>
   <div>
     <div class="control">
+      <h3>Instructions</h3>
+      <p>Use <b>W, D, S, A</b></br>
+        and move to the exit</p>
       <h3>Field parameters</h3>
       <p>
         <label>Field width</label>
@@ -31,6 +34,11 @@
       </p>
       <p>
         <button class="btn" @click="recreateField">Recreate field</button>
+        <button
+          class="btn"
+          @click="autopilot = !autopilot"
+          :class="autopilot ? 'btn_success' : ''"
+        >{{this.autopilot | autopilotbutton}}</button>
       </p>
     </div>
     <section
@@ -42,21 +50,29 @@
         :key="i"
         class="field__item"
         :class="defineItemClass(i-1)"
-        :style="fieldItemStyle">{{i-1}}</div>
+        :style="fieldItemStyle"><!--{{movementMap[i-1]}}--></div>
     </section>
+    <notification
+      :text="notifications[notifications.length - 1]"
+    ></notification>
   </div>
 </template>
 
 <script>
   import f from './../functions'
+  import notification from './notification'
   export default {
   	data(){
   		return {
+  			notifications: [],
+  			autopilot: true,
+        movementMap: [],
         field: {
+        	initialState: '',
           widthPx: '',
           heightPx: '',
-          width: 10, //blocks number
-          height: 10, //blocks number
+          width: 3, //blocks number
+          height: 3, //blocks number
           limits: { //hardcoded limits
             max: {
               width: 20, //block number
@@ -69,7 +85,7 @@
           },
         },
         walls: {
-          number: 5, //blocks number
+          number: 1, //blocks number
           position: []
         },
         player: {
@@ -81,6 +97,12 @@
         },
         fieldStyle: {},
         fieldItemStyle: {}
+      }
+    },
+    filters: {
+			autopilotbutton(state){
+				if (state) return "Disable autopilot"
+        else return "Enable autopilot"
       }
     },
 		methods: {
@@ -129,6 +151,7 @@
 				this.addWallBlocks();
 				this.addPlayer();
 				this.addExit();
+				this.field.initialState = this.fieldState;
       },
       createField(){//functions sequence to create new field
         this.calcFieldActualSize();
@@ -143,28 +166,45 @@
       movePlayer(event){//moving player around the field
       	let direction = f.defineDirection(event.key);
       	if (f.checkIfTheMoveIsPossible(this.fieldState, direction)) {
-      		let up, right, down, left;
+      		let pp ,up, right, down, left;
+      		pp = this.player.position;
       		//changing player position
       		switch (direction){
             case 'up': {
-							this.player.position = this.player.position - this.field.width;
-              break;
+							this.player.position = pp - this.field.width;
+							break;
             }
 						case 'right': {
-							this.player.position = this.player.position + 1;
+							this.fieldState[pp]++;
+							this.player.position = pp + 1;
 							break;
 						}
 						case 'down': {
-							this.player.position = this.player.position + this.field.width;
+							this.fieldState[pp]++;
+							this.player.position = pp + this.field.width;
 							break;
 						}
 						case 'left': {
-							this.player.position = this.player.position - 1;
+							this.fieldState[pp]++;
+							this.player.position = pp - 1;
 							break;
 						}
           }
+					if (this.autopilot) {
+      			this.movementMap[pp]++;
+					}
           if (this.player.position == this.exit.position) this.win();
         }
+      },
+      autoPilot(){
+        //creating new array
+        this.movementMap = new Array(this.fieldItemsNumber);
+        //setting the number
+        this.movementMap.find((el, i, arr) => {
+        	if (this.walls.position.indexOf(i) != -1) arr[i] = 'w'
+          else arr[i] = 0;
+        });
+        //console.log(f.autoPilotChooseDirection(this.movementMap, this.fieldState));
       },
       calcFieldActualSize(){
         this.field.heightPx = this.$refs.field.clientHeight;
@@ -186,20 +226,26 @@
       },
       handleWidthInput(event){ //ensure that inputted value is not collapsing anything
         let value = Number(event.target.value);
-        if (value > this.field.limits.max.width) this.field.width = this.field.limits.max.width
+        //THIS CHECK is not working donowhy (need to fix it later)
+			  if (this.field.height * value - 2 < this.walls.number) {
+			  	this.walls.number = this.field.height * value - 2;
+			  	this.field.width = value
+			  }
+        else if (value > this.field.limits.max.width) this.field.width = this.field.limits.max.width
         else if (value < this.field.limits.min.width || Number.isNaN(value)) this.field.width = this.field.limits.min.width
         else this.field.width = value;
-        //check if all that walls can fit into new size field
-        this.handleWallsNumber();
         this.recreateField();
       },
       handleHeightInput(event){ //ensure that inputted value is not collapsing anything
         let value = Number(event.target.value);
-        if (value > this.field.limits.max.height) this.field.height = this.field.limits.max.height
+        //THIS CHECK is not working donowhy (need to fix it later)
+				if (this.field.width * value - 2 < this.walls.number) {
+					this.walls.number = this.field.width * value - 2;
+					this.field.height = value
+				}
+        else if (value > this.field.limits.max.height) this.field.height = this.field.limits.max.height
         else if (value < this.field.limits.min.height || Number.isNaN(value)) this.field.height = this.field.limits.min.height
         else this.field.height = value;
-        //check if all that walls can fit into new size field
-        this.handleWallsNumber();
         this.recreateField();
       },
       handleWallsNumberInput(event){ //ensure that inputted value is not collapsing anything
@@ -211,12 +257,19 @@
         this.recreateField();
       },
       checkWallsNumber(wallsNumber) { //check if all that walls can fit into the field
-      	if (wallsNumber > this.wallsMaxNumber) return wallsNumber-1;
+      	if (wallsNumber > this.wallsMaxNumber) return wallsNumber - 1;
       	else return wallsNumber;
       },
 			win(){
-        console.log('Great! You escaped in', this.player.moves.length, 'moves');
+        this.notifications.push('Well done! You escaped in ' + this.player.moves.length + ' moves');
+        let winInfo = {
+        	moves: this.player.moves,
+          movesNumber: this.player.moves.length,
+          fieldInitialState: this.field.initialState
+        };
+				this.$http.post('https://labyrinth-73914.firebaseio.com/wins.json', winInfo);
         this.recreateField();
+				if (this.autopilot) this.autoPilot();
 			},
 		},
     computed: {
@@ -227,6 +280,7 @@
   	  	let fieldItems = new Array(this.fieldItemsNumber);
   	  	for (var i = 0; i < this.fieldItemsNumber; i++) {
           if (i == this.player.position) fieldItems[i] = 'p'
+          else if (i == this.exit.position) fieldItems[i] = 'e'
           else if (this.walls.position.indexOf(i) != -1) fieldItems[i] = 'w'
           else fieldItems[i] = 0;
 				}
@@ -239,7 +293,7 @@
       },
       wallsMaxNumber(){
       	return this.fieldItemsNumber - 2; //reserve 1 item for player and 1 item for exit
-      }
+      },
     },
     watch: { //recreate field when someone define a new walls number
   	  'walls.number'(){
@@ -247,7 +301,13 @@
       },
       'player.position'(){
 				this.player.moves.push(this.player.position);
+      },
+      autopilot(){
+      	if (this.autopilot){this.autoPilot()}
       }
+    },
+    components: {
+  		notification
     },
 		mounted(){
   		let vm = this;
@@ -256,6 +316,8 @@
 				window.addEventListener('resize', this.checkDevice);
 				window.addEventListener('keydown', function(event){vm.movePlayer(event)});
 				this.createField();
+				//for dev
+				if (this.autopilot){this.autoPilot()}
 			})
 		},
 		beforeDestroy() {//removing event listeners
