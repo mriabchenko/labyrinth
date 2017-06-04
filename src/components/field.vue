@@ -75,6 +75,9 @@
         player: {
           position: ''
         },
+        exit: {
+        	position: ''
+        },
         fieldStyle: {},
         fieldItemStyle: {}
       }
@@ -103,25 +106,36 @@
 					}
 				}
       },
+			addExit(){
+				let ExitPosition;
+				while (true) {
+					ExitPosition = f.random(this.fieldItemsNumber);
+					if (this.walls.position.indexOf(ExitPosition) == -1) {
+						this.exit.position = ExitPosition;
+						break;
+					}
+				}
+			},
 			defineItemClass(item) { //is the block is wall or player or just empty field
         if (this.walls.position.indexOf(item) != -1) return 'field__item_wall';
+        if (this.exit.position == item) return 'field__item_exit';
         if (this.player.position == item) return 'field__item_player';
 			},
+      buildField(){
+				this.calcFieldItemStyle();
+				this.calcFieldStyle();
+				this.addWallBlocks();
+				this.addPlayer();
+				this.addExit();
+      },
       createField(){//functions sequence to create new field
         this.calcFieldActualSize();
-        this.calcFieldItemStyle();
-        this.calcFieldStyle();
-        this.addWallBlocks();
-        this.addPlayer();
+        this.buildField();
       },
       recreateField(){//functions sequence to recreate new field
       	this.walls.position = [];
       	this.player.position = '';
-				this.calcFieldItemStyle();
-				this.calcFieldStyle();
-				this.addWallBlocks();
-				this.handleWallsNumber();
-				this.addPlayer();
+				this.buildField();
       },
       movePlayer(event){//moving player around the field
       	let direction = f.defineDirection(event.key);
