@@ -55,8 +55,8 @@
         field: {
           widthPx: '',
           heightPx: '',
-          width: 3, //blocks number
-          height:3, //blocks number
+          width: 10, //blocks number
+          height: 10, //blocks number
           limits: { //hardcoded limits
             max: {
               width: 20, //block number
@@ -73,7 +73,8 @@
           position: []
         },
         player: {
-          position: ''
+          position: '',
+          moves: []
         },
         exit: {
         	position: ''
@@ -110,6 +111,7 @@
 				let ExitPosition;
 				while (true) {
 					ExitPosition = f.random(this.fieldItemsNumber);
+					//check if there is no wall or player on this position
 					if ((this.walls.position.indexOf(ExitPosition) == -1)&&(ExitPosition != this.player.position)) {
 						this.exit.position = ExitPosition;
 						break;
@@ -135,12 +137,14 @@
       recreateField(){//functions sequence to recreate new field
       	this.walls.position = [];
       	this.player.position = '';
+      	this.player.moves = [];
 				this.buildField();
       },
       movePlayer(event){//moving player around the field
       	let direction = f.defineDirection(event.key);
       	if (f.checkIfTheMoveIsPossible(this.fieldState, direction)) {
       		let up, right, down, left;
+      		//changing player position
       		switch (direction){
             case 'up': {
 							this.player.position = this.player.position - this.field.width;
@@ -159,6 +163,7 @@
 							break;
 						}
           }
+          if (this.player.position == this.exit.position) this.win();
         }
       },
       calcFieldActualSize(){
@@ -208,7 +213,11 @@
       checkWallsNumber(wallsNumber) { //check if all that walls can fit into the field
       	if (wallsNumber > this.wallsMaxNumber) return wallsNumber-1;
       	else return wallsNumber;
-      }
+      },
+			win(){
+        console.log('Great! You escaped in', this.player.moves.length, 'moves');
+        this.recreateField();
+			},
 		},
     computed: {
   	  fieldItemsNumber(){ //how many field items are in the field
@@ -235,6 +244,9 @@
     watch: { //recreate field when someone define a new walls number
   	  'walls.number'(){
   	    this.recreateField();
+      },
+      'player.position'(){
+				this.player.moves.push(this.player.position);
       }
     },
 		mounted(){
