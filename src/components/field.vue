@@ -110,7 +110,7 @@
 				let ExitPosition;
 				while (true) {
 					ExitPosition = f.random(this.fieldItemsNumber);
-					if (this.walls.position.indexOf(ExitPosition) == -1) {
+					if ((this.walls.position.indexOf(ExitPosition) == -1)&&(ExitPosition != this.player.position)) {
 						this.exit.position = ExitPosition;
 						break;
 					}
