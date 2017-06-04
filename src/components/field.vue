@@ -55,8 +55,8 @@
         field: {
           widthPx: '',
           heightPx: '',
-          width: 15, //blocks number
-          height: 15, //blocks number
+          width: 3, //blocks number
+          height:3, //blocks number
           limits: { //hardcoded limits
             max: {
               width: 20, //block number
@@ -199,14 +199,15 @@
       },
       handleWallsNumberInput(event){ //ensure that inputted value is not collapsing anything
         let value = Number(event.target.value);
-        if (value >= this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1
-        else if (value < 0 || Number.isNaN(value)) this.walls.number = 0
+        value = this.checkWallsNumber(value);
+        if (value < 0 || Number.isNaN(value)) this.walls.number = 0
         else this.walls.number = value;
 				//check if all that walls can fit into new size field
         this.recreateField();
       },
-      handleWallsNumber() { //check if all that walls can fit into the field
-      	if (this.walls.number >= this.fieldItemsNumber - 1) this.walls.number = this.fieldItemsNumber - 1;
+      checkWallsNumber(wallsNumber) { //check if all that walls can fit into the field
+      	if (wallsNumber > this.wallsMaxNumber) return wallsNumber-1;
+      	else return wallsNumber;
       }
 		},
     computed: {
@@ -226,6 +227,9 @@
           items: fieldItems
 				};
   	  	return fieldObj;
+      },
+      wallsMaxNumber(){
+      	return this.fieldItemsNumber - 2; //reserve 1 item for player and 1 item for exit
       }
     },
     watch: { //recreate field when someone define a new walls number
