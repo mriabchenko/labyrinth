@@ -55,8 +55,8 @@
         field: {
           widthPx: '',
           heightPx: '',
-          width: 3, //blocks number
-          height: 3, //blocks number
+          width: 15, //blocks number
+          height: 15, //blocks number
           limits: { //hardcoded limits
             max: {
               width: 20, //block number
@@ -128,26 +128,22 @@
       	if (f.checkIfTheMoveIsPossible(this.fieldState, direction)) {
       		let up, right, down, left;
       		switch (direction){
-//            case 'up': {
-//							up = this.fieldState.items[this.player.position - this.field.width];
-//							console.log(up);
-//              break;
-//            };
-//						case 'right': {
-//							right = this.fieldState.items[this.player.position + 1];
-//							console.log(right);
-//							break;
-//						};
-//						case 'down': {
-//							down = this.fieldState.items[this.player.position + this.field.width];
-//							console.log(down);
-//							break;
-//						};
-//						case 'left': {
-//							left = this.fieldState.items[this.player.position - 1];
-//							console.log(left);
-//							break;
-//						};
+            case 'up': {
+							this.player.position = this.player.position - this.field.width;
+              break;
+            }
+						case 'right': {
+							this.player.position = this.player.position + 1;
+							break;
+						}
+						case 'down': {
+							this.player.position = this.player.position + this.field.width;
+							break;
+						}
+						case 'left': {
+							this.player.position = this.player.position - 1;
+							break;
+						}
           }
         }
       },
