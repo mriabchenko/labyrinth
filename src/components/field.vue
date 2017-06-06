@@ -50,7 +50,7 @@
         :key="i"
         class="field__item"
         :class="defineItemClass(i-1)"
-        :style="fieldItemStyle"><!--{{movementMap[i-1]}}--></div>
+        :style="fieldItemStyle">{{movementMap[i-1]}}</div>
     </section>
     <notification
       :text="notifications[notifications.length - 1]"
@@ -71,8 +71,8 @@
         	initialState: '',
           widthPx: '',
           heightPx: '',
-          width: 3, //blocks number
-          height: 3, //blocks number
+          width: 7, //blocks number
+          height: 7, //blocks number
           limits: { //hardcoded limits
             max: {
               width: 20, //block number
@@ -85,7 +85,7 @@
           },
         },
         walls: {
-          number: 1, //blocks number
+          number: 10, //blocks number
           position: []
         },
         player: {
@@ -163,40 +163,44 @@
       	this.player.moves = [];
 				this.buildField();
       },
+      changePlayerPosition(direction){
+				let pp ,up, right, down, left;
+				pp = this.player.position;
+				//changing player position
+				switch (direction){
+					case 'up': {
+						this.player.position = pp - this.field.width;
+						break;
+					}
+					case 'right': {
+						this.fieldState[pp]++;
+						this.player.position = pp + 1;
+						break;
+					}
+					case 'down': {
+						this.fieldState[pp]++;
+						this.player.position = pp + this.field.width;
+						break;
+					}
+					case 'left': {
+						this.fieldState[pp]++;
+						this.player.position = pp - 1;
+						break;
+					}
+				}
+				if (this.autopilot) {
+					this.movementMap[pp]++;
+				}
+				if (this.player.position == this.exit.position) this.win();
+      },
       movePlayer(event){//moving player around the field
       	let direction = f.defineDirection(event.key);
       	if (f.checkIfTheMoveIsPossible(this.fieldState, direction)) {
-      		let pp ,up, right, down, left;
-      		pp = this.player.position;
-      		//changing player position
-      		switch (direction){
-            case 'up': {
-							this.player.position = pp - this.field.width;
-							break;
-            }
-						case 'right': {
-							this.fieldState[pp]++;
-							this.player.position = pp + 1;
-							break;
-						}
-						case 'down': {
-							this.fieldState[pp]++;
-							this.player.position = pp + this.field.width;
-							break;
-						}
-						case 'left': {
-							this.fieldState[pp]++;
-							this.player.position = pp - 1;
-							break;
-						}
-          }
-					if (this.autopilot) {
-      			this.movementMap[pp]++;
-					}
-          if (this.player.position == this.exit.position) this.win();
+      		this.changePlayerPosition(direction);
         }
       },
       autoPilot(){
+      	var i;
         //creating new array
         this.movementMap = new Array(this.fieldItemsNumber);
         //setting the number
@@ -204,7 +208,12 @@
         	if (this.walls.position.indexOf(i) != -1) arr[i] = 'w'
           else arr[i] = 0;
         });
-        //console.log(f.autoPilotChooseDirection(this.movementMap, this.fieldState));
+        i = setInterval(function() {
+        	if (this.autopilot){
+						this.changePlayerPosition(f.autoPilotChooseDirection(this.movementMap, this.fieldState))
+          }
+          else clearInterval(i);
+				}.bind(this), 1000);
       },
       calcFieldActualSize(){
         this.field.heightPx = this.$refs.field.clientHeight;
