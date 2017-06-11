@@ -50,7 +50,7 @@
         :key="i"
         class="field__item"
         :class="defineItemClass(i-1)"
-        :style="fieldItemStyle">{{movementMap[i-1]}}</div>
+        :style="fieldItemStyle">{{i-1}}({{movementMap[i-1]}})</div>
     </section>
     <notification
       :text="notifications[notifications.length - 1]"

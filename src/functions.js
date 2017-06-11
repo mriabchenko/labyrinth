@@ -33,16 +33,31 @@ export default {
 		else return false;
   },
   autoPilotChooseDirection(movementMap, wallsMap){
-		let neighbours, neighboursValues, posibilities, minItem;
+		console.log('______________________');
+		console.log('movementMap:',movementMap);
+		console.log('wallsMap:',wallsMap);
+		let neighbours, pp, minVal;
+		pp = wallsMap.items.indexOf('p'); //pp - player postion
 		neighbours = this.defineNeighbours(wallsMap);
-		//go to exit, if it is neighbour
-		if (this.gotoNeighbourExit(neighbours)) return this.gotoNeighbourExit(neighbours);
-		neighboursValues = Object.values(neighbours);
-		// neighboursValues.find(function (element, index, array) {
-		// 	parseInt(array[index])
-		// });
-		this.isDeadEnd(neighbours);
-
+		console.log('neighbours:',neighbours);
+		console.log('player position:',pp);
+		//define neighbours values from walls map
+		for (var direction in neighbours){
+			if (direction == 'up') neighbours[direction] = movementMap[pp - wallsMap.width];
+			if (direction == 'right') neighbours[direction] = movementMap[pp + 1];
+			if (direction == 'down') neighbours[direction] = movementMap[pp + wallsMap.width];
+			if (direction == 'left') neighbours[direction] = movementMap[pp - 1];
+		}
+		console.log('neighbours movement values:', neighbours);
+		//difine minimum neighbour value
+		minVal = 9999;
+		for (var direction in neighbours){
+			if (neighbours[direction] < minVal) minVal = neighbours[direction]
+		}
+		//search for direction with minimal value
+		for (var direction in neighbours){
+			if (neighbours[direction] == minVal) return direction
+		}
 		return 'up'
 	},
 	gotoNeighbourExit(neighbours){
@@ -54,8 +69,8 @@ export default {
 		else return false
 	},
 	isDeadEnd(neighbours){
-		for(var key in neighbours){
-			console.log(key);
-		}
+		// for(var key in neighbours){
+		// 	console.log(key);
+		// }
 	}
 }
